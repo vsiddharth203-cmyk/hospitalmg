@@ -1,4 +1,3 @@
-# Changed from 8.2-fpm to 8.4-fpm to satisfy your package constraints
 FROM php:8.4-fpm
 
 # Install system dependencies and PostgreSQL dev libraries
@@ -16,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 # Clear cache
 RUN apt-get clean && rm -rf /var/list/apt/lists/*
 
-# Install PHP extensions (including pdo_pgsql and pgsql)
+# Install PHP extensions
 RUN docker-php-ext-install pdo pdo_pgsql pgsql mbstring exif pcntl bcmath gd
 
 # Get latest Composer
@@ -31,10 +30,13 @@ COPY . /var/www/html
 # Install application dependencies
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
+# Copy our custom Nginx configuration over the default one
+COPY nginx.conf /etc/nginx/sites-available/default
+
 # Set correct permissions for Laravel storage and cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 EXPOSE 80
 
-# Start nginx and php-fpm
-CMD service nginx start && php-fpm
+# Start PHP-FPM in the background, then run Nginx in the foreground
+CMD php-fpm -D && nginx -g "daemon off;"
