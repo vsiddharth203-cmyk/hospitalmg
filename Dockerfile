@@ -1,4 +1,5 @@
-FROM php:8.2-fpm
+# Changed from 8.2-fpm to 8.4-fpm to satisfy your package constraints
+FROM php:8.4-fpm
 
 # Install system dependencies and PostgreSQL dev libraries
 RUN apt-get update && apt-get install -y \
@@ -33,8 +34,7 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev
 # Set correct permissions for Laravel storage and cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Copy Nginx configuration (If you have a custom one, otherwise use standard)
 EXPOSE 80
 
-# Run entrypoint script or start nginx/php-fpm directly
+# Start nginx and php-fpm
 CMD service nginx start && php-fpm
