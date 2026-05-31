@@ -36,7 +36,10 @@ COPY nginx.conf /etc/nginx/sites-available/default
 # Set correct permissions for Laravel storage and cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Make sure our entrypoint script has execution permissions
+RUN chmod +x /var/www/html/entrypoint.sh
+
 EXPOSE 80
 
-# Run migrations automatically on startup, then boot up services
-CMD php artisan migrate --force && php-fpm -D && nginx -g "daemon off;"
+# Trigger our script on runtime deployment
+ENTRYPOINT ["/var/www/html/entrypoint.sh"]
