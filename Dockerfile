@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     nginx
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/list/apt/lists/*
+# Clean up package manager cache correctly (Fixed path from /var/list to /var/lib)
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_pgsql pgsql mbstring exif pcntl bcmath gd
@@ -41,5 +41,5 @@ RUN chmod +x /var/www/html/entrypoint.sh
 
 EXPOSE 80
 
-# Trigger our script on runtime deployment
-ENTRYPOINT ["/var/www/html/entrypoint.sh"]
+# Trigger our script on runtime deployment using explicit shell execution style
+ENTRYPOINT ["/bin/sh", "/var/www/html/entrypoint.sh"]
