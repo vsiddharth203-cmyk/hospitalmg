@@ -38,5 +38,5 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 EXPOSE 80
 
-# Start PHP-FPM in the background, then run Nginx in the foreground
-CMD php-fpm -D && nginx -g "daemon off;"
+# Run migrations automatically on startup, then boot up services
+CMD php artisan migrate --force && php-fpm -D && nginx -g "daemon off;"
