@@ -1,17 +1,18 @@
 # Use the official PHP image with Apache
 FROM php:8.2-apache
 
-# Install system dependencies and PHP extensions
+# Install system dependencies and PHP extensions (Includes PostgreSQL drivers)
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
     libzip-dev \
+    libpq-dev \
     zip \
     unzip \
     git \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd pdo pdo_mysql zip
+    && docker-php-ext-install gd pdo pdo_mysql pdo_pgsql zip
 
 # Enable Apache rewrite module for Laravel routing
 RUN a2enmod rewrite
@@ -35,3 +36,6 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 
 # Expose port 80
 EXPOSE 80
+
+# Run migrations automatically on container boot, then start Apache server
+CMD php artisan migrate --force && apache2-foreground
