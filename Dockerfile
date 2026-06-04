@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     nginx
 
-# Clean up package manager cache correctly (Fixed path from /var/list to /var/lib)
+# Clean up package manager cache correctly 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
@@ -33,8 +33,8 @@ RUN composer install --no-interaction --optimize-autoloader --no-dev
 # Copy our custom Nginx configuration over the default one
 COPY nginx.conf /etc/nginx/sites-available/default
 
-# Set correct permissions for Laravel storage and cache
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# CRITICAL FIX: Grant full ownership of the entire workspace to www-data
+RUN chown -R www-data:www-data /var/www/html
 
 # Make sure our entrypoint script has execution permissions
 RUN chmod +x /var/www/html/entrypoint.sh
